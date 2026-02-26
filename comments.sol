@@ -33,14 +33,14 @@
         - Validar balance suficiente.✔
         - Emitir evento Withdraw(address indexed user, uint256 amount).✔
 
-    [4] Access Control
+    [4] Access Control ✔
         - Ownable o AccessControl.
         - Solo el owner puede:
             - Pausar el contrato.
             - Activar funciones administrativas.
         - Considerar rol ADMIN_ROLE si usas AccessControl.
 
-    [5] Pausable
+    [5] Pausable ✔
         - Permitir pausar depósitos y retiros en caso de emergencia.
         - Usar whenNotPaused modifier.
 
@@ -53,9 +53,9 @@
         (Reducen gas comparado con require strings)
 
     [7] Eventos
-        - event Deposit(address indexed user, uint256 amount);
-        - event Withdraw(address indexed user, uint256 amount);
-        - event EmergencyPause(address indexed triggeredBy);
+        - event Deposit(address indexed user, uint256 amount);✔
+        - event Withdraw(address indexed user, uint256 amount);✔
+        - event EmergencyPause(address indexed triggeredBy);✔
 
     -------------------------------------------------------------
     ADVANCED FEATURES (Nivel Empresa)
