@@ -7,6 +7,7 @@ error InsufficientBalance();
 error ZeroDeposit();
 error TransferFailed();
 error NotAuthorized();
+error NotPermitidBalance();
 
 contract SecureVault {
     uint256 maxBalance;
@@ -22,11 +23,13 @@ contract SecureVault {
 
     modifier checkAmount() {
         if (msg.value < 0) revert ZeroDeposit();
+        if (msg.value > maxBalance) revert NotPermitidBalance();
         _;
     }
 
     modifier checkBalance(uint256 amount) {
         if (balance[msg.sender] < amount) revert InsufficientBalance(); // -> Check
+
         _;
     }
     // event

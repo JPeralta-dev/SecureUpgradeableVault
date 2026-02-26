@@ -29,7 +29,7 @@
 
     [3] Withdraw
         - Patrón Checks-Effects-Interactions. ✔
-        - Protección contra reentrancy (ReentrancyGuard).
+        - Protección contra reentrancy (ReentrancyGuard). ✔
         - Validar balance suficiente.✔
         - Emitir evento Withdraw(address indexed user, uint256 amount).✔
 
