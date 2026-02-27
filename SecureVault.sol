@@ -185,4 +185,12 @@ contract SecureVault is ReentrancyGuard {
         if (msg.sender != admin) revert NotAuthorized();
         IsPaused = false;
     }
+    /// @notice Updates the maximum allowed balance.
+    /// @dev    Only the admin can call this function.
+    ///         Sets a new value for `maxBalance`.
+    /// @param  newMaxBalance_ New maximum balance allowed.
+    function modifierMaxBalance(uint256 newMaxBalance_) public {
+        if (msg.sender != admin) revert NotAuthorized();
+        maxBalance = newMaxBalance_;
+    }
 }
