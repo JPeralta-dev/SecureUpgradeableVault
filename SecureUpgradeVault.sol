@@ -1,7 +1,8 @@
-//SPDX-License-1dentifier: LGPL-3.0-on1Y
 //SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.28;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 error InsufficientBalance();
 error ZeroDeposit();
@@ -10,7 +11,7 @@ error NotAuthorized();
 error NotPermitidBalance();
 error EmergencyPauseError();
 
-contract SecureVault {
+contract SecureVault is ReentrancyGuard {
     uint256 public maxBalance;
     address private admin;
     mapping(address => uint256) private balance;
@@ -27,32 +28,33 @@ contract SecureVault {
     modifier checkAmount() {
         if (IsPaused == true) revert EmergencyPauseError();
         if (msg.value == 0) revert ZeroDeposit();
-        if (msg.value > maxBalance) revert NotPermitidBalance();
+        if (msg.value > maxBalance) revert NotPermitidBalance(); // quiero controlar el balance maximo de ether que entra
         _;
     }
 
     modifier checkBalance(uint256 amount) {
-        if (IsPaused == true) revert EmergencyPauseError();
         if (balance[msg.sender] < amount) revert InsufficientBalance(); // -> Check
         _;
     }
     // event
 
-    event DepositEvent(address indexed user, uint256 amount); // imporante siempre utilizar el indexed para que el evento tome menos gas
-    event WithdrawEvent(address indexed user, uint256 amount);
-    event EmergencyPause(address indexed triggeredBy);
+    event depositEvent(address indexed user, uint256 amount); // imporante siempre utilizar el indexed para que el evento tome menos gas
+    event withdrawEvent(address indexed user, uint256 amount);
+    event emergencyPause(address indexed triggeredBy);
     // funtions
 
     // extennal o public
     function deposit() public payable checkAmount {
         balance[msg.sender] += msg.value; // msg.value es el numero del ether que manda en la transferencia
-        emit DepositEvent(msg.sender, msg.value);
+        emit depositEvent(msg.sender, msg.value);
     }
 
-    function withdraw(uint256 amount_) public checkBalance(amount_) {
-        // patron Checks-Effects-Interactions.
+    function withdraw(
+        uint256 amount_
+    ) public nonReentrant checkBalance(amount_) {
+        // patron Checks-Effects-Interactions. y aplicame es Reentrency para que nadie pueda robar
         balance[msg.sender] -= amount_; // -> Effects
-        emit WithdrawEvent(msg.sender, balance[msg.sender]);
+        emit withdrawEvent(msg.sender, amount_);
 
         (bool success, ) = msg.sender.call{value: amount_}(""); // -> Interactions
 
@@ -62,7 +64,7 @@ contract SecureVault {
     function pause() public {
         if (msg.sender != admin) revert NotAuthorized();
         IsPaused = true;
-        emit EmergencyPause(msg.sender);
+        emit emergencyPause(msg.sender);
     }
 
     function unPause() public {
